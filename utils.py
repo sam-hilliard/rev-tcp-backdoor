@@ -1,6 +1,5 @@
 """
-Common utilities that can be used across different
-applications.
+Common utilities.
 """
 
 import requests
