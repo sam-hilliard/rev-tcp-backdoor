@@ -7,10 +7,15 @@ import subprocess
 import argparse
 
 # downloads a file from a url to a specific location
-def download(url, filename):
+def download(url):
+    last_slash = url.rindex("/") + 1
+    fname = url[last_slash:]
+
     r = requests.get(url)
-    with open(filename, "wb") as f:
+    with open(fname, "wb") as f:
         f.write(r.content)
+
+    return fname
 
 # executes a command and returns the output
 def execute_cmd(cmd):

@@ -45,6 +45,13 @@ def handle_cmd(cmd):
         return sys_info()
 
     # download a file
+    if keyword == 'download':
+        url = cmd.split('download')[1].strip()
+        try:
+            fname = utils.download(url)
+            return 'Sucessfully downloaded and saved to {fname}.'.format(fname=fname)
+        except:
+            return 'Unable to fetch ' + url
 
     # upload a file
 
