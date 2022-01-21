@@ -12,22 +12,23 @@ def main():
     print('[+] Listening for incoming connections.')
     listener.listen(1)
 
-    client, client_ip = listener.accept()
-    print('[+] Received connection from {ip}.'.format(ip=client_ip))
-
     try:
-        while True:
-            cmd = input('$ ').encode('utf-8')
-            client.sendall(cmd)
+        client, client_ip = listener.accept()
+        print('[+] Received connection from {ip}.'.format(ip=client_ip))
 
-            if cmd == 'exit':
-                print('[+] Exitting.')
-                break
+        while True:
+
+            cmd = input('$ ')
+            client.sendall(cmd.encode('utf-8'))
             
             out = client.recv(1024).decode('utf-8')
             print(out)
-    except:
-        print('[+] Exitting...')
+
+            if cmd == 'exit':
+                print('[+] Exitting...')
+                break
+    except KeyboardInterrupt:
+        print('\n[+] Exitting...')
 
     listener.close()
 
